@@ -5,9 +5,13 @@ A legitimate site for anti GPT-detection
 
 1. Install the dependencies:
 
+Vue part:
+
 ```bash
 npm install
 ```
+
+FastAPI part:
 
 ```bash
 pip install fastapi
