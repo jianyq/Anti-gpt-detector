@@ -5,15 +5,12 @@ A legitimate site for anti GPT-detection
 
 1. Install the dependencies:
 
-Vue part:
+
 
 ```bash
+# Vue part:
 npm install
-```
-
-FastAPI part:
-
-```bash
+# FastAPI part:
 pip install fastapi
 pip install "uvicorn[standard]"
 ```
