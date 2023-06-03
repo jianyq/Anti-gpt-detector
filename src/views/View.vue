@@ -16,17 +16,29 @@
                 :autosize="{
                     minRows: 1,
                 }"
+                @input="limitWords"
                 placeholder="What's your text?"
                 v-model:value="text"
             >
+            
             </n-input>
             <p v-if="ans" class="text-slate-400">
                 <p class="text-sm opacity-75 font-bold mt-3 mb-1 text-slate-500">Result:</p>
                 {{ ans }}
             </p>
+            <p v-if="detect_result" class="text-slate-400">
+                <p class="text-sm opacity-75 font-bold mt-3 mb-1 text-slate-500">detect-Result:</p>
+                {{ detect_result }}
+            </p>
+            
         </div>
+        <p class="text-slate-400" style="text-align: right;">
+            <span>{{ language }}: {{ wordCount }} / 256 words</span>
+        </p>
         <div class="m-3">
-            <n-button @click="humanize">{{ isCompleted ? 'Try again':'Humanize'  }}</n-button>
+            
+            <n-button @click="humanize">{{ isCompleted ? 'Try again':'Humanize'  }}</n-button><span></span>
+            <n-button @click="aidetect">{{ isCompleteddetect ? 'Stop':'Start detect'  }}</n-button>
         </div>
     </div>
 </template>
@@ -37,25 +49,78 @@ const text = ref('');
 const ans = ref(null);
 const humanize = async () => {
     if (isCompleted.value) {
-        text.value = '';
+        // text.value = '';
         ans.value = null;
         isCompleted.value = false;
         return;
     }
-    const data = await request(text.value);
+    const data = await requestph(text.value);
     ans.value = data;
     isCompleted.value = true;
 };
-
-const request = async (text) => {
-    // test without api
-    console.log(text);
-    return 'Hello World';
-
-    // test with api
-    /* const { data } = await axios.post('https://localhost:1234/encrypt', {
-        text,
-    });
-    return data; */
+const isCompleteddetect = ref(false);
+const detect_result = ref(null);
+const aidetect = async () => {
+    if (isCompleteddetect.value) {
+        // text.value = '';
+        detect_result.value = null;
+        isCompleteddetect.value = false;
+        return;
+    }
+    const data = await requestde(text.value);
+    detect_result.value = data;
+    isCompleteddetect.value = true;
 };
+
+const requestph = async (text) => {
+    // test without api
+    // console.log(text);
+    const {data} = await axios.get('http://127.0.0.1:8000/paraph/?q=' + text);
+    for (let i = 0; i < 5; ++i) {
+        // console.log(data[i]);
+        const res = await requestde(data['result'][i]);
+        if(res === "Human")return data['result'][i];
+    }
+        //I want to iterate a string array
+    return "Can't make it humanized :(";
+
+};
+const wordCount = ref(0);
+
+const limitWords = () => {
+    language.value = detectLanguage(text.value);
+    if (language.value == "Chinese") {
+        wordCount.value = text.value.length;
+    }
+    else {
+        let words = text.value.split(' ').filter(Boolean); // Filter out empty strings
+        wordCount.value = words.length
+    }
+    ;
+    
+    if (words.length > 256) {
+        text.value = words.slice(0, 256).join(' '); // Limit to the first 256 words
+    }
+}
+const requestde = async (text) => {
+    const {data} = await axios.get('http://127.0.0.1:8000/detect/?q=' + text);
+    console.log(data);
+    return data;
+}
+
+const language = ref("Other");
+
+// const updateLanguage = () => {
+//     language.value = detectLanguage(text.value);
+// }
+
+function detectLanguage(input) {
+    const hasChinese = /[\u4E00-\u9FFF]/.test(input);
+    const hasEnglish = /[a-zA-Z]/.test(input);
+    
+    if (hasChinese && !hasEnglish) return "Chinese";
+    if (!hasChinese && hasEnglish) return "English";
+    if (hasChinese && hasEnglish) return "Mixed";
+    return "Other";
+}
 </script>
