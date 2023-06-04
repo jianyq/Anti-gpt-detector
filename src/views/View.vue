@@ -98,8 +98,8 @@ const limitWords = () => {
     }
     ;
     
-    if (words.length > 256) {
-        text.value = words.slice(0, 256).join(' '); // Limit to the first 256 words
+    if (text.length > 256) {
+        text.value = text.slice(0, 256).join(' '); // Limit to the first 256 words
     }
 }
 const requestde = async (text) => {
