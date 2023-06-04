@@ -19,4 +19,5 @@ pip install "uvicorn[standard]"
 
 ```bash
 npm run dev
+uvicorn text_aug:app --reload
 ```
