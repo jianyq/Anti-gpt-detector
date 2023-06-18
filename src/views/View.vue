@@ -27,7 +27,7 @@
                 {{ ans }}
             </p>
             <p v-if="detect_result" class="text-slate-400">
-                <p class="text-sm opacity-75 font-bold mt-3 mb-1 text-slate-500">detect-Result:</p>
+                <p class="text-sm opacity-75 font-bold mt-3 mb-1 text-slate-500">Detect-Result:</p>
                 {{ detect_result }}
             </p>
             
@@ -36,9 +36,13 @@
             <span>{{ language }}: {{ wordCount }} / 256 words</span>
         </p>
         <div class="m-3">
-            
-            <n-button @click="humanize">{{ isCompleted ? 'Try again':'Humanize'  }}</n-button><span></span>
+            <n-space>
+            <n-button @click="humanize">{{ isCompleted ? 'Try again':'Humanize'  }}</n-button>
             <n-button @click="aidetect">{{ isCompleteddetect ? 'Stop':'Start detect'  }}</n-button>
+            </n-space>
+        </div>
+        <div class="m-3 flex">
+            <Detector v-for="api in detect_list" :detect_func="api.func" :name="api.name"></Detector>
         </div>
     </div>
 </template>
@@ -94,12 +98,10 @@ const limitWords = () => {
     }
     else {
         let words = text.value.split(' ').filter(Boolean); // Filter out empty strings
-        wordCount.value = words.length
-    }
-    ;
-    
-    if (text.length > 256) {
-        text.value = text.slice(0, 256).join(' '); // Limit to the first 256 words
+        wordCount.value = words.length;
+        if (words.length > 256) {
+            text.value = words.slice(0, 256).join(' '); // Limit to the first 256 words
+        }
     }
 }
 const requestde = async (text) => {
@@ -123,4 +125,42 @@ function detectLanguage(input) {
     if (hasChinese && hasEnglish) return "Mixed";
     return "Other";
 }
+
+
+// detect part
+import Detector from '../components/Detector.vue';
+const detect_list = [
+    {
+        name: 'GPTZERO',
+        func: async ()=>{}
+    },
+    {
+        name: 'OPENAI',
+        func: async ()=>{}
+    },
+    {
+        name: 'WRITER',
+        func: async ()=>{}
+    },
+    {
+        name: 'CROSSPLAG',
+        func: async ()=>{}
+    },
+    {
+        name: 'COPYLEAKS',
+        func: async ()=>{}
+    },
+    {
+        name: 'SAPLING',
+        func: async ()=>{}
+    },
+    {
+        name: 'CONTENTATSCALE',
+        func: async ()=>{}
+    },
+    {
+        name: 'ZEROGPT',
+        func: async ()=>{}
+    },
+]
 </script>
